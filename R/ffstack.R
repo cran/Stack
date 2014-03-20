@@ -1,6 +1,6 @@
-.ffStack <- function(ffdf, df, return.data.frame=TRUE, verbose=FALSE) {
-    require(ff)
-    require(ffbase)
+##' @importFrom ff ramclass as.ff ff nrow<-
+##' @importFrom bit ri
+.ffStack <- function(ffdf, df, verbose=FALSE, ...) {
     df1 <- ffdf
     df <- .preparedf(df)
     df2 <- df
@@ -9,7 +9,7 @@
     names.2 <- setdiff(names(df2), names(df1))   # names in 2 but not 1
     nx <- nrow(ffdf) ## need for indices to insert y; we extend length next
     ny <- length(df[[1]])
-    ff::nrow(ffdf) <- nx + ny
+    nrow(ffdf) <- nx + ny
     xi <- ri(1,nx) ## range index of original x
     yi <- ri(nx+1, nx+ny)
 
@@ -79,8 +79,6 @@
     ffdf
 }
 .ffffStack <- function(ffdf, df, verbose=FALSE) {
-    require(ff)
-    require(ffbase)
     df1 <- ffdf
     df2 <- df
     names.both <- intersect(names(df1), names(df2)) # names in both
@@ -105,7 +103,7 @@
             ffdf[[j]] <- .stackappend(x, y, nx)
         } else {
             if(factorx & !factory &
-               length(unique(na.omit(y))) <= length(levels(x))) {
+               length(na.omit(unique(y)[])) <= length(levels(x))) {
                 newlevels <- levels(x)
                 y <- factor(levels(x)[y[]])
                 ffdf[[j]] <- .stackappend(x, y, nx)
@@ -113,16 +111,20 @@
                               'levels from ', sQuote("df1"), sep=""),
                         call.=FALSE)
             }
-            if (factory==TRUE &&
-                is.null(ramclass(x)) &&
+            if (factory && !factorx  &&
                 ## unique.ff provided by ffbase
                 ## !! need to use xi index here to not select
                 ## !! the 0s introduced by extending nrow of ffdf
-                length(unique(na.omit(x[xi]))) <= length(levels(y))) {
+                length(na.omit(unique(x[xi])[])) <= length(levels(y))) {
                 newlevels <- levels(y)
                 ## 'upgrade' x to a factor
                 ## ? can the extend cases be handled here?
-                ffdf[[j]] <- ff(factor(c(x[xi], y[]), labels=newlevels))
+                ans  <- try(factor(c(x[xi], y[]), labels=newlevels))
+                if(!inherits(ans,'try-error')) {
+                    ffdf[[j]] <- ff(ans)
+                } else {
+                    warning(paste(sQuote(j),": levels incompatible"))
+                }
                 warning(paste(sQuote(j), ": mixed integer-factor: assigned ",
                               'levels from ', sQuote("df2"),sep=""),
                         call.=FALSE)
@@ -137,11 +139,11 @@
     ## values in y positions. Fill nx+1:ny with NA.
     ffdf[yi, names.1] <- NA
     for (j in names.2) { ## create the new columns in ffdf, initdata=NA
-        if(is.factor(df[[j]])) {
+        if(ff::is.factor(df[[j]])) {
             newlevels <- na.omit(levels(df[[j]]))
             ffdf[[j]] <- suppressWarnings(ff(NA, length=nrow(ffdf),
                                              vmode=vmode(df[[j]]),
-                                             newlevels)
+                                             levels=newlevels)
                                           )
         } else {
             ffdf[[j]] <- ff(NA, length=nrow(ffdf), vmode="integer")
@@ -159,19 +161,20 @@
 ##' into it, expanding factor levels as needed, and possibly enlarging
 ##' vmodes of existing ff columns.
 ##'
+##' @rdname ffStack
+##' @docType methods
 ##' @param ffdf an \code{\link[ff]{ffdf}}
 ##' @param df a \code{\link[base]{data.frame}}
 ##' @param verbose print extra information about columns as they stack
 ##' @param ... further arguments
 ##' @return An ffdf.
+##' @import methods
 ##' @export
-setGeneric("ffStack", function (ffdf, df, verbose, ...) {
+setGeneric("ffStack", function (ffdf, df, verbose=FALSE, ...) {
     standardGeneric("ffStack") })
 setOldClass("ffdf")
 ##' @rdname ffStack
-##' @aliases ffStack,ffdf,data.frame-method
-##' @aliases ffStack,ffdf,list-method
-##' @aliases ffStack,ffdf,ffdf-method
+##' @aliases ffStack,ffdf,data.frame-method ffStack,ffdf,list-method ffStack,ffdf,ffdf-method
 setMethod("ffStack", signature("ffdf", "data.frame"), .ffStack)
 setMethod("ffStack", signature("ffdf", "list"), .ffStack)
 setMethod("ffStack", signature("ffdf", "ffdf"), .ffffStack)
@@ -208,6 +211,8 @@ setMethod("ffStack", signature("ffdf", "ffdf"), .ffffStack)
     df
 }
 
+##' @importFrom ff as.ff clone
+##' @importFrom bit as.which chunk
 .stackappend <- function(x, y, nx, adjustvmode=TRUE, ...){
     if (is.null(x)){
         if (is.ff(y)){
@@ -259,5 +264,3 @@ setMethod("ffStack", signature("ffdf", "ffdf"), .ffffStack)
             call.=FALSE)
     ans
 }
-
-

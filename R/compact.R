@@ -12,6 +12,7 @@
 }
 
 ##' @rdname compact
+##' @importFrom ff vmode clone
 ##' @S3method .compact ff
 .compact.ff <- function(x, use.na=TRUE, ...){
     vm <- which(.vmode == vmode(x)) # which of these is x?
@@ -31,7 +32,6 @@
 ##' @rdname compact
 ##' @S3method .compact ffdf
 .compact.ffdf <- function(x, use.na=TRUE, ...){
-    require(ff)
     ret <- lapply(ff::physical.ffdf(x), .compact.ff, use.na=use.na)
     res <- do.call(ff::ffdf, c(ret, row.names=NULL))
     close(x)
@@ -50,8 +50,8 @@
 ##' @param x ff
 ##' @param y ff or vector
 ##' @param use.na require a vmode that supports NAs? default=TRUE
+##' @importFrom ff vmode clone is.ff
 .upgradevmode <- function(x, y, use.na=TRUE){
-    require(ffbase)
     vm <- which(.vmode == vmode(x))
     ## just return the true doubles -- this condition is annoying
     if (vm > 9 && !isTRUE(all.equal(as.integer(x[]),x[]))){
@@ -67,7 +67,11 @@
         r <- range(rx,ry, na.rm=TRUE)
         if(identical(r, c(-Inf, Inf))) {
             rx <- range(ffbase::unique.ff(x), na.rm=TRUE)
-            ry <- range(ffbase::unique.ff(y), na.rm=TRUE)
+            if(is.ff(y)) {
+                ry <- range(ffbase::unique.ff(y), na.rm=TRUE)
+            } else {
+                ry <- range(y)
+            }
             r <- range(rx, ry, na.rm=TRUE)
         }
     }
@@ -79,7 +83,7 @@
     m <- which(m[idx])[1]
     if (is.na(m)) m <- 2 ## use 'logical' if col is 100% NA
     if (m != vm){
-        ff::clone(x, vmode=.vmode[m], pattern="./")
+        clone(x, vmode=.vmode[m], pattern="./")
     } else {
         x
     }
@@ -90,9 +94,8 @@
 ##' @param x any R type
 ##' @param use.na require that the vmode handle NAs
 ##' @return int index of ff vmode that will hold x.
-## @importFrom ff is.factor .vmin .vmax .vmode .vNA
+##' @importFrom ff is.factor .vmin .vmax .vmode .vNA
 find_min_vmode <- function(x, use.na=TRUE) {
-    require(ffbase)
     ## boolean     1        ushort      8
     ## logical     2        integer     9
     ## quad        3        single     10

@@ -3,7 +3,7 @@
 \title{Add a length of NAs before or after x
 (used in Stacking)}
 \usage{
-  padNA(x, before = 0, after = 0)
+padNA(x, before = 0, after = 0)
 }
 \arguments{
   \item{x}{a data vector}
@@ -13,9 +13,9 @@
   \item{after}{length of NA to insert}
 }
 \value{
-  same vector padded with NAs.
+same vector padded with NAs.
 }
 \description{
-  Add a length of NAs before or after x (used in Stacking)
+Add a length of NAs before or after x (used in Stacking)
 }
 

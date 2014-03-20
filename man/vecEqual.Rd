@@ -2,7 +2,7 @@
 \alias{vecEqual}
 \title{Test equality and order of a vector}
 \usage{
-  vecEqual(x, y, order = FALSE)
+vecEqual(x, y, order = FALSE)
 }
 \arguments{
   \item{x}{character}
@@ -12,9 +12,9 @@
   \item{order}{logical. stricter test for order of x and y}
 }
 \value{
-  logical
+logical
 }
 \description{
-  Test equality and order of a vector
+Test equality and order of a vector
 }
 

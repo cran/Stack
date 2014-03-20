@@ -2,8 +2,8 @@
 \alias{matrixIntegrate}
 \title{Integrate matrices based on their dim names}
 \usage{
-  matrixIntegrate(x, y, x.names = dimnames(x),
-    y.names = dimnames(y), joinFunction = pasteExp)
+matrixIntegrate(x, y, x.names = dimnames(x), y.names = dimnames(y),
+  joinFunction = pasteExp)
 }
 \arguments{
   \item{x}{matrix}
@@ -17,10 +17,10 @@
   \item{joinFunction}{function used to join things}
 }
 \value{
-  union of x and y, with \emph{write something about
-  expected return ordering}.
+union of x and y, with \emph{write something about expected
+return ordering}.
 }
 \description{
-  Integrate matrices based on their dim names
+Integrate matrices based on their dim names
 }
 

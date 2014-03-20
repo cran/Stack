@@ -3,10 +3,9 @@
 \title{Stack
 Combine data frames with column names that do not completely intersect}
 \usage{
-  Stack(df1, df2, return.data.frame = TRUE,
-    dates = c("wave", "date"), origin = "1970-01-01",
-    mixed.chr.factor = c("factor", "character"),
-    verbose = FALSE)
+Stack(df1, df2, return.data.frame = TRUE, dates = c("wave", "date"),
+  origin = "1970-01-01", mixed.chr.factor = c("factor", "character"),
+  verbose = FALSE)
 }
 \arguments{
   \item{df1}{a \code{data.frame} or a list}
@@ -34,15 +33,15 @@ Combine data frames with column names that do not completely intersect}
   about each column.}
 }
 \value{
-  a list of data vectors suitable for coercion to a
-  \code{data.frame}. Because \code{\link{as.data.frame}} is
-  extremely costly and memory-intensive, and Stacking often
-  involves many such column-wise combinations, avoid this
-  by returning a list.
+a list of data vectors suitable for coercion to a
+\code{data.frame}. Because \code{\link{as.data.frame}} is
+extremely costly and memory-intensive, and Stacking often
+involves many such column-wise combinations, avoid this by
+returning a list.
 }
 \description{
-  Stack Combine data frames with column names that do not
-  completely intersect
+Stack Combine data frames with column names that do not
+completely intersect
 }
 \examples{
 testdf1 <- data.frame(both.int=1:4,
